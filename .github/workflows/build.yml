@@ -3,32 +3,29 @@ name: Build VC:MP 0.1c on Windows
 on:
   push:
     branches:
-      - main  # Trigger on pushes to the main branch
-  pull_request:
-    branches:
-      - main  # Trigger on pull requests to the main branch
+      - main  # Replace with your default branch name if different
+  workflow_dispatch:  # Allow manual triggering
 
 jobs:
   build:
-    runs-on: windows-latest  # Use the latest Windows runner
+    runs-on: windows-latest  # Use a Windows runner
 
     steps:
-      # Step 1: Check out the repository
+      # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Visual Studio Build Tools
+      # Step 2: Set up MSBuild
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v1
 
-      # Step 3: Install RakNet (if not included in the repo)
-      # If RakNet is already in the repo, skip this step.
+      # Step 3: Download and extract RakNet (if not included in the repo)
       - name: Download RakNet
         run: |
           Invoke-WebRequest -Uri "http://www.rakkarsoft.com/raknet/downloads/RakNet.zip" -OutFile "RakNet.zip"
           Expand-Archive -Path "RakNet.zip" -DestinationPath "raknet" -Force
 
-      # Step 4: Modify RakNet files (add enum IDs and #pragma pack(1))
+      # Step 4: Modify RakNet files
       - name: Modify RakNet files
         run: |
           # Add enum IDs to PacketEnumerations.h
@@ -40,7 +37,7 @@ jobs:
           $content = "#pragma pack(1)`n" + $content
           Set-Content -Path $networkTypesPath -Value $content
 
-      # Step 5: Compile the project using MSBuild
+      # Step 5: Compile the project
       - name: Compile VC:MP
         run: |
           msbuild vcmp.sln /p:Configuration=Release /p:Platform=Win32
