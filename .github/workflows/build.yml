@@ -42,9 +42,9 @@ jobs:
         run: |
           msbuild vcmp.sln /p:Configuration=Release /p:Platform=Win32
 
-      # Step 6: Upload build artifacts (optional)
+      # Step 6: Upload build artifacts (using actions/upload-artifact@v4)
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: vcmp-build
           path: |
