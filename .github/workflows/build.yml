@@ -11,7 +11,7 @@ jobs:
     runs-on: windows-latest  # Use a Windows runner
 
     steps:
-      # Step 1: Checkout the repository
+      # Step 1: Checkout the repository (including the pre-downloaded RakNet library)
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -19,13 +19,7 @@ jobs:
       - name: Set up MSBuild
         uses: microsoft/setup-msbuild@v1
 
-      # Step 3: Download and extract RakNet (if not included in the repo)
-      - name: Download RakNet
-        run: |
-          Invoke-WebRequest -Uri "http://www.rakkarsoft.com/raknet/downloads/RakNet.zip" -OutFile "RakNet.zip"
-          Expand-Archive -Path "RakNet.zip" -DestinationPath "raknet" -Force
-
-      # Step 4: Modify RakNet files
+      # Step 3: Modify RakNet files
       - name: Modify RakNet files
         run: |
           # Add enum IDs to PacketEnumerations.h
@@ -37,12 +31,12 @@ jobs:
           $content = "#pragma pack(1)`n" + $content
           Set-Content -Path $networkTypesPath -Value $content
 
-      # Step 5: Compile the project
+      # Step 4: Compile the project
       - name: Compile VC:MP
         run: |
           msbuild vcmp.sln /p:Configuration=Release /p:Platform=Win32
 
-      # Step 6: Upload build artifacts (using actions/upload-artifact@v4)
+      # Step 5: Upload build artifacts (optional)
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
